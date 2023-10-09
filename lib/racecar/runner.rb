@@ -268,6 +268,14 @@ module Racecar
         logger.error "Failed to process #{desc} at #{offsets}: #{e}"
 
         logger.warn "Pausing partition #{desc} for #{pause.backoff_interval} seconds"
+        instrumentation_payload = {
+          topic: topic,
+          partition: partition,
+          offset: offsets.first,
+          duration: pause.pause_duration,
+          consumer_class: processor.class.to_s
+        }
+        @instrumenter.instrument("pause", instrumentation_payload)
         consumer.pause(topic, partition, offsets.first)
         pause.pause!
       end
