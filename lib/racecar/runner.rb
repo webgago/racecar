@@ -68,6 +68,8 @@ module Racecar
         consumer_set: consumer
       }
 
+      @instrumenter.instrument("start", instrumentation_payload)
+
       # Main loop
       loop do
         break if @stop_requested
