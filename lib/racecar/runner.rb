@@ -17,11 +17,15 @@ module Racecar
       @stop_requested = false
       Rdkafka::Config.logger = logger
 
-      if processor.respond_to?(:statistics_callback)
-        Rdkafka::Config.statistics_callback = processor.method(:statistics_callback).to_proc
-      end
+      Rdkafka::Config.statistics_callback = method(:statistics_callback).to_proc
 
       setup_pauses
+    end
+
+    def statistics_callback(stats)
+      config.instrumenter.instrument("statistics", stats)
+      processor.respond_to?(:statistics_callback) &&
+        processor.statistics_callback(stats)
     end
 
     def setup_pauses
